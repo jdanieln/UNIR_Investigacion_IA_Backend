@@ -83,7 +83,7 @@ def root():
 
 
 @app.route("/getPrediction/<string:start_date>/<string:end_date>/<string:product>", methods=["GET"])
-def get_sales_by_date(start_date, end_date):
+def get_sales_by_date(start_date, end_date,product):
     results=""
     return jsonify(status=True, data=results), 200
 
