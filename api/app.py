@@ -1,32 +1,21 @@
-from datetime import datetime, timedelta
 import json
-from flask import Flask, request
+from flask import Flask
 from flask import jsonify
 from config import config
 from flask_cors import CORS
 import pandas as pd
-import numpy as np
-import tensorflow as tf
-from tensorflow import keras
-import tkinter as tk
-from tkinter import filedialog
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-from tensorflow import keras
-import seaborn as sns
-import matplotlib.pyplot as plt
 from funciones import *
-
 
 def create_app(env):
     app = Flask(__name__)
     CORS(app)
-    app.config['DEBUG'] = True
+    app.config['DEBUG'] = env.DEBUG
     app.config.from_object(env)
 
     return app
-
 
 env = config['development']
 app = create_app(env)
@@ -72,22 +61,16 @@ def dataFrame():
             'resumen_historial_de_ventas_por_semana': resumen_historial_de_ventas_por_semana             
         }
     }
-
     resultados_json = json.dumps(resultados_dict)
     return jsonify({"dataframe":df_json,"resumenes":resultados_json})
 
-@app.route("/")
+@app.route("/home")
 def root():
-
     return "Works!!"
-
-
 @app.route("/getPrediction/<string:start_date>/<string:end_date>/<string:product>", methods=["GET"])
 def get_sales_by_date(start_date, end_date,product):
     results=""
     return jsonify(status=True, data=results), 200
-
-
 if __name__ == '__main__':
-    app.run( host='0.0.0.0',port=5002)
+    app.run()
  
