@@ -90,31 +90,36 @@ def get_sales_by_date(start_date, end_date,product):
         loaded_model = load_model("./../modelo-ia/modelo.h5")
 
         # Preprocesar las fechas y otros datos según sea necesario
-        # Aquí asumimos que las fechas se proporcionan en formato "YYYY-MM-DD HH:mm:ss"
         start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
         end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
 
-        # Aquí puedes realizar cualquier otro preprocesamiento necesario de los datos de entrada
-        # Por ejemplo, codificar la variable categórica "product" si es necesario
+        # Inicializar una lista para almacenar las predicciones
+        predictions_list = []
 
-        # Crear un ejemplo de input_data (asegúrate de que tenga las mismas características que se utilizaron durante el entrenamiento)
-        # En este ejemplo, se asume que tienes un conjunto de características que coincide con las que se utilizaron en el modelo
-        input_data = np.array([[
-        start_date.year, start_date.month, start_date.day, start_date.hour, start_date.minute, start_date.weekday(),
-        product  # Añade la variable "product" codificada aquí si es necesario
-        ]])
+        # Iterar a través del rango de fechas y realizar predicciones para cada fecha
+        current_date = start_date
+        while current_date <= end_date:
+            # Crea un ejemplo de input_data para la fecha actual
+            input_data = np.array([[
+                current_date.year, current_date.month, current_date.day, current_date.hour, current_date.minute, current_date.weekday(),
+                product  # Añade la variable "product" codificada aquí si es necesario
+            ]])
 
-        # Realizar la predicción
-        predictions = loaded_model.predict(input_data)
+            # Realizar la predicción
+            prediction = loaded_model.predict(input_data)[0][0]  # Tomar el valor de la predicción
 
-        # Las predicciones se pueden ajustar según sea necesario antes de incluirlas en la respuesta JSON
+            # Almacena la fecha y la predicción en una lista
+            predictions_list.append({
+                "date": current_date.strftime("%Y-%m-%d %H:%M:%S"),
+                "prediction": prediction
+            })
 
-        # Convertir las predicciones a una lista de Python
-        predictions_list = predictions.tolist()
+            # Incrementar la fecha en un intervalo (por ejemplo, 1 hora)
+            current_date += timedelta(hours=1)
 
-        # Crear un diccionario que contenga las predicciones
+        # Devolver las predicciones en formato JSON
         response = {
-        "predictions": predictions_list
+            "predictions": predictions_list
         }
 
         return jsonify(status=True, data=response), 200
