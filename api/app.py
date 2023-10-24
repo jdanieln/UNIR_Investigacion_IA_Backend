@@ -1,3 +1,4 @@
+import datetime
 import json
 from flask import Flask
 from flask import jsonify
@@ -7,9 +8,13 @@ from flask_cors import CORS
 import pandas as pd
 import pandas as pd
 import numpy as np
-import tensorflow as tf
 from funciones import *
 import os
+from keras.models import load_model
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow import keras
+
 
 import csv
 if not os.path.exists('data.csv'):
@@ -98,19 +103,21 @@ def createCSV(dataframe, csv_filename):
 def root():
     return "Works!!"
 @app.route("/getPrediction/<string:start_date>/<string:end_date>/<string:product>", methods=["GET"])
-def get_sales_by_date(start_date, end_date,product):
+def getPrediction(start_date, end_date,product):
     try:
         # Cargar el modelo previamente entrenado
+        print("Cargando modelo")  
         loaded_model = load_model("./../modelo-ia/modelo.keras")
-
         # Preprocesar las fechas y otros datos según sea necesario
         # Aquí asumimos que las fechas se proporcionan en formato "YYYY-MM-DD HH:mm:ss"
         start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
         end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
 
+
+        print("startDate",start_date)
+        print("endDate",end_date)                    
         # Aquí puedes realizar cualquier otro preprocesamiento necesario de los datos de entrada
         # Por ejemplo, codificar la variable categórica "product" si es necesario
-
         # Crear un ejemplo de input_data (asegúrate de que tenga las mismas características que se utilizaron durante el entrenamiento)
         # En este ejemplo, se asume que tienes un conjunto de características que coincide con las que se utilizaron en el modelo
         input_data = np.array([[
@@ -130,7 +137,7 @@ def get_sales_by_date(start_date, end_date,product):
         response = {
         "predictions": predictions_list
         }
-
+        print(response)
         return jsonify(status=True, data=response), 200
 
     except Exception as e:
