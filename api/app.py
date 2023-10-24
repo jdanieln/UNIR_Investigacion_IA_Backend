@@ -17,6 +17,7 @@ from tensorflow import keras
 from keras.models import load_model
 import seaborn as sns
 import matplotlib.pyplot as plt
+
 from funciones import *
 
 
@@ -89,7 +90,7 @@ def get_sales_by_date(start_date, end_date,product):
         # Cargar el modelo previamente entrenado
         loaded_model = load_model("./../modelo-ia/modelo.h5")
 
-        # Preprocesar las fechas y otros datos según sea necesario
+         # Preprocesar las fechas y otros datos según sea necesario
         start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
         end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
 
