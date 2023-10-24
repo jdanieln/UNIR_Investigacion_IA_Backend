@@ -87,7 +87,7 @@ def root():
 def get_sales_by_date(start_date, end_date,product):
     try:
         # Cargar el modelo previamente entrenado
-        loaded_model = load_model("./../modelo-ia/modelo.keras")
+        loaded_model = load_model("./../modelo-ia/modelo.h5")
 
         # Preprocesar las fechas y otros datos según sea necesario
         # Aquí asumimos que las fechas se proporcionan en formato "YYYY-MM-DD HH:mm:ss"
