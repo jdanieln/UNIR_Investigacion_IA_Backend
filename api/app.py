@@ -142,7 +142,7 @@ def get_sales_by_date(start_date, end_date,product):
         response = {
             "predictions": predictions_list
         }
-
+        # Responder JSON
         return jsonify(status=True, data=response), 200
 
     except Exception as e:
