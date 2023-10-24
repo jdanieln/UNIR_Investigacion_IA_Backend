@@ -17,6 +17,7 @@ from tensorflow import keras
 from keras.models import load_model
 import seaborn as sns
 import matplotlib.pyplot as plt
+import json
 
 from funciones import *
 
@@ -87,8 +88,21 @@ def root():
 @app.route("/getPrediction/<string:start_date>/<string:end_date>/<string:product>", methods=["GET"])
 def get_sales_by_date(start_date, end_date,product):
     try:
-        # Cargar el modelo previamente entrenado
-        loaded_model = load_model("./../modelo-ia/modelo.h5")
+        product_label_mapping = ""
+
+        with open('modelo-ia/product_label_mapping.json', 'r') as file:
+            print("**")
+            product_label_mapping = json.load(file)
+
+        print("***")
+        encoded_product = product_label_mapping.get(product, -1)
+        print("encoded_product", encoded_product)
+
+        # Cargar el modelo desde el archivo .h5
+        loaded_model = load_model("modelo-ia/modelo.h5")
+
+        # Cargar los pesos del modelo desde el archivo .h5
+        loaded_model.load_weights("modelo-ia/pesos_modelo.h5")
 
          # Preprocesar las fechas y otros datos según sea necesario
         start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
@@ -101,14 +115,15 @@ def get_sales_by_date(start_date, end_date,product):
         current_date = start_date
         while current_date <= end_date:
             # Crea un ejemplo de input_data para la fecha actual
-            input_data = np.array([[
-                current_date.year, current_date.month, current_date.day, current_date.hour, current_date.minute, current_date.weekday(),
-                product  # Añade la variable "product" codificada aquí si es necesario
-            ]])
+            input_data = np.array([[[
+                int(current_date.year), int(current_date.month), int(current_date.day), int(current_date.hour), int(current_date.minute), int(current_date.weekday()),
+                encoded_product  # Añade la variable "product" codificada aquí si es necesario
+            ]]])
 
             # Realizar la predicción
+            print("input_data", input_data)
             prediction = loaded_model.predict(input_data)[0][0]  # Tomar el valor de la predicción
-
+            print("prediction")
             # Almacena la fecha y la predicción en una lista
             predictions_list.append({
                 "date": current_date.strftime("%Y-%m-%d %H:%M:%S"),
@@ -117,6 +132,11 @@ def get_sales_by_date(start_date, end_date,product):
 
             # Incrementar la fecha en un intervalo (por ejemplo, 1 hora)
             current_date += timedelta(hours=1)
+
+        print(predictions_list)
+        for prediction in predictions_list:
+            if 'prediction' in prediction:
+                prediction['prediction'] = float(prediction['prediction'])
 
         # Devolver las predicciones en formato JSON
         response = {
