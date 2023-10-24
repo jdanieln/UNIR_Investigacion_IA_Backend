@@ -139,7 +139,7 @@ def get_sales_by_date(start_date, end_date,product):
             })
 
             # Incrementar la fecha en un intervalo (por ejemplo, 1 hora)
-            current_date += timedelta(hours=1)
+            current_date += datetime.timedelta(hours=1)
 
         # Devolver las predicciones en formato JSON
         response = {
