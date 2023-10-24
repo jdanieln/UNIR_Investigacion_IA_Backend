@@ -108,6 +108,8 @@ def get_sales_by_date(start_date, end_date,product):
         start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
         end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
 
+        total_product_predicted = 0
+
         # Inicializar una lista para almacenar las predicciones
         predictions_list = []
 
@@ -123,24 +125,17 @@ def get_sales_by_date(start_date, end_date,product):
             # Realizar la predicción
             print("input_data", input_data)
             prediction = loaded_model.predict(input_data)[0][0]  # Tomar el valor de la predicción
-            print("prediction")
-            # Almacena la fecha y la predicción en una lista
-            predictions_list.append({
-                "date": current_date.strftime("%Y-%m-%d %H:%M:%S"),
-                "prediction": prediction
-            })
+            print("prediction:", prediction)
+
+            total_product_predicted += float(prediction)
 
             # Incrementar la fecha en un intervalo (por ejemplo, 1 hora)
-            current_date += timedelta(hours=1)
-
-        print(predictions_list)
-        for prediction in predictions_list:
-            if 'prediction' in prediction:
-                prediction['prediction'] = float(prediction['prediction'])
+            current_date += timedelta(days=1)
 
         # Devolver las predicciones en formato JSON
         response = {
-            "predictions": predictions_list
+            "product": product,
+            "quantity_ordered": total_product_predicted
         }
         # Responder JSON
         return jsonify(status=True, data=response), 200
